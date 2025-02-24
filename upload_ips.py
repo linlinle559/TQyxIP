@@ -88,7 +88,7 @@ def main():
             all_ips.extend(ip_list)  # 将当前 URL 提取的 IP 添加到总列表中
     
     # 标注IP地理位置
-    annotated_ips = annotate_ips(all_ips)
+    //annotated_ips = annotate_ips(all_ips)
     
     # 将所有提取的 IP 列表合并
     file_content = "\n".join(annotated_ips)
