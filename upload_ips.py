@@ -2,7 +2,6 @@ import requests
 import csv
 import os
 from github import Github
-import re
 
 # GitHub 配置
 github_token = os.getenv("MY_GITHUB_TOKEN")
@@ -11,17 +10,17 @@ file_path = "bzgj.txt"  # 存储 IP 列表的文件路径
 commit_message = "Update bestcf IP list"
 
 # IP地理位置API配置
-ipinfo_token = "80a32dbe4fc97e"  # 替换为你的ipinfo.io API密钥
-ipinfo_base_url = "https://ipinfo.io/"
+//ipinfo_token = "80a32dbe4fc97e"  # 替换为你的ipinfo.io API密钥
+//ipinfo_base_url = "https://ipinfo.io/"
 
 # 自定义前缀和后缀
-custom_prefix = "可"  # 自定义前缀加在 IP# 后面
-custom_suffix = "变"  # 自定义后缀加在国家代码后面
+custom_prefix = "优选"  # 自定义前缀加在 IP# 后面
+custom_suffix = "IP"  # 自定义后缀加在国家代码后面
 
 # 多个 API 地址
 csv_urls = [
     "https://ipdb.030101.xyz/api/bestcf.csv",  # 第一个链接
-    "https://addcsv.sosorg.nyc.mn/addressesapi.csv?token=ZYSS" # 可以添加更多链接
+    //"https://addcsv.sosorg.nyc.mn/addressesapi.csv?token=ZYSS" # 可以添加更多链接
 ]
 limit_count = 10  # 限制提取前 5 个 IP，改成 10 以提取 10 个
 
@@ -39,11 +38,11 @@ def extract_ips(csv_content):
     reader = csv.reader(csv_content.splitlines())
     for row in reader:
         try:
-            if row and len(row) > 1:  # 检查是否有IP和端口
+            if row and len(row) > 1 and row[0].count('.') == 3:  # 简单检查 IPv4 地址格式
                 ip_with_port = row[0]
-                match = re.match(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)", ip_with_port)
-                if match:
-                    ip, port = match.groups()
+                port_index = ip_with_port.rfind(':')
+                if port_index != -1:
+                    ip, port = ip_with_port[:port_index], ip_with_port[port_index+1:]
                 else:
                     ip = ip_with_port
                     port = '443'  # 默认端口
