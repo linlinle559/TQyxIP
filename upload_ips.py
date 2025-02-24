@@ -50,18 +50,20 @@ def get_ip_location(ip):
     if response.status_code == 200:
         data = response.json()
         country = data.get("country", "Unknown")
-        return f"{ip}#{custom_prefix}{country}{custom_suffix}"
+        return country
     else:
-        return f"{ip}#{custom_prefix}Unknown{custom_suffix}"
+        return "Unknown"
 
 def annotate_ips(ips):
-    annotated_ips = []
+    annotated_ips = set()  # 使用集合来避免重复
     for ip, port in ips:
+        country = get_ip_location(ip)
         if port:
-            annotated_ips.append(f"{ip}:{port}#{custom_prefix}{get_ip_location(ip).split('#')[1]}{custom_suffix}")
+            ip_address = f"{ip}:{port}"
         else:
-            annotated_ips.append(f"{ip}:443#{custom_prefix}{get_ip_location(ip).split('#')[1]}{custom_suffix}")
-    return annotated_ips
+            ip_address = f"{ip}:443"
+        annotated_ips.add(f"{ip_address}#{custom_prefix}{country}{custom_suffix}")
+    return list(annotated_ips)
 
 def upload_to_github(token, repo_name, file_path, content, commit_message):
     g = Github(token)
@@ -70,7 +72,7 @@ def upload_to_github(token, repo_name, file_path, content, commit_message):
         file = repo.get_contents(file_path)
         repo.update_file(file.path, commit_message, content, file.sha)
     except:
-        repo.create_file(file_path, commit_message, content)
+        repo.create_file(file.path, commit_message, content)
 
 def main():
     all_ips = []
