@@ -38,11 +38,11 @@ def extract_ips(csv_content):
     reader = csv.reader(csv_content.splitlines())
     for row in reader:
         try:
-            if row and len(row) > 1:  # 检查是否有IP和端口
+            if row and len(row) > 1 and row[0].count('.') == 3:  # 简单检查 IPv4 地址格式
                 ip_with_port = row[0]
-                match = re.match(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)", ip_with_port)
-                if match:
-                    ip, port = match.groups()
+                port_index = ip_with_port.rfind(':')
+                if port_index != -1:
+                    ip, port = ip_with_port[:port_index], ip_with_port[port_index+1:]
                 else:
                     ip = ip_with_port
                     port = '443'  # 默认端口
