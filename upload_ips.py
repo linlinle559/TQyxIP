@@ -25,24 +25,31 @@ csv_urls = [
 limit_count = 10  # 限制提取前 5 个 IP，改成 10 以提取 10 个
 
 def download_csv(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    return response.text
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as e:
+        print(f"Error downloading {url}: {e}")
+        return ""
 
 def extract_ips(csv_content):
     ips = []
     reader = csv.reader(csv_content.splitlines())
     for row in reader:
-        if row and row[0].count('.') == 3:  # 简单检查 IPv4 地址格式
-            ip_with_port = row[0]
-            if ':' in ip_with_port:
-                ip, port = ip_with_port.split(':')
-            else:
-                ip = ip_with_port
-                port = '443'
-            ips.append((ip, port))
-        if len(ips) >= limit_count:  # 达到限制数量后停止
-            break
+        try:
+            if row and len(row) > 1 and row[0].count('.') == 3:  # 简单检查 IPv4 地址格式
+                ip_with_port = row[0]
+                port_index = ip_with_port.rfind(':')
+                if port_index != -1:
+                    ip, port = ip_with_port[:port_index], ip_with_port[port_index+1:]
+                else:
+                    ip, port = ip_with_port, '443'
+                ips.append((ip, port))
+                if len(ips) >= limit_count:  # 达到限制数量后停止
+                    break
+        except Exception as e:
+            print(f"Error processing row {row}: {e}")
     return ips
 
 def get_ip_location(ip):
@@ -55,15 +62,11 @@ def get_ip_location(ip):
         return "Unknown"
 
 def annotate_ips(ips):
-    annotated_ips = set()  # 使用集合来避免重复
+    annotated_ips = []
     for ip, port in ips:
         country = get_ip_location(ip)
-        if port:
-            ip_address = f"{ip}:{port}"
-        else:
-            ip_address = f"{ip}:443"
-        annotated_ips.add(f"{ip_address}#{custom_prefix}{country}{custom_suffix}")
-    return list(annotated_ips)
+        annotated_ips.append(f"{ip}:{port}#{custom_prefix}{country}{custom_suffix}")
+    return annotated_ips
 
 def upload_to_github(token, repo_name, file_path, content, commit_message):
     g = Github(token)
@@ -72,15 +75,16 @@ def upload_to_github(token, repo_name, file_path, content, commit_message):
         file = repo.get_contents(file_path)
         repo.update_file(file.path, commit_message, content, file.sha)
     except:
-        repo.create_file(file.path, commit_message, content)
+        repo.create_file(file_path, commit_message, content)
 
 def main():
     all_ips = []
     for url in csv_urls:
         print(f"Downloading data from: {url}")
         csv_content = download_csv(url)
-        ip_list = extract_ips(csv_content)
-        all_ips.extend(ip_list)  # 将当前 URL 提取的 IP 添加到总列表中
+        if csv_content:
+            ip_list = extract_ips(csv_content)
+            all_ips.extend(ip_list)  # 将当前 URL 提取的 IP 添加到总列表中
     
     # 标注IP地理位置
     annotated_ips = annotate_ips(all_ips)
