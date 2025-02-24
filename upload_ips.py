@@ -41,10 +41,9 @@ def extract_ips(csv_content):
         try:
             if row and len(row) > 1:  # 检查是否有IP和端口
                 ip_with_port = row[0]
-                match = re.match(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?::(\d+))?", ip_with_port)
+                match = re.match(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)", ip_with_port)
                 if match:
                     ip, port = match.groups()
-                    port = port if port else '443'  # 默认端口
                 else:
                     ip = ip_with_port
                     port = '443'  # 默认端口
