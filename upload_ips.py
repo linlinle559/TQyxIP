@@ -14,8 +14,8 @@ ipinfo_token = "80a32dbe4fc97e"  # 替换为你的ipinfo.io API密钥
 ipinfo_base_url = "https://ipinfo.io/"
 
 # 自定义前缀和后缀
-custom_prefix = ""  # 自定义前缀
-custom_suffix = ""  # 自定义后缀
+custom_prefix = "可"  # 自定义前缀加在 # 后面
+custom_suffix = "变"  # 自定义后缀加在国家代码前面
 
 # 多个 API 地址
 csv_urls = [
@@ -44,9 +44,9 @@ def get_ip_location(ip):
     if response.status_code == 200:
         data = response.json()
         country = data.get("country", "Unknown")
-        return f"{custom_prefix}{ip}#{country}{custom_suffix}"
+        return f"{ip}#{custom_prefix}{custom_suffix}{country}"
     else:
-        return f"{custom_prefix}{ip}#Unknown{custom_suffix}"
+        return f"{ip}#{custom_prefix}Unknown{custom_suffix}"
 
 def annotate_ips(ips):
     annotated_ips = []
