@@ -20,7 +20,7 @@ custom_suffix = "变"  # 自定义后缀加在国家代码后面
 # 多个 API 地址
 csv_urls = [
     "https://ipdb.030101.xyz/api/bestcf.csv",  # 第一个链接
-    # 可以添加更多链接
+    "https://addcsv.sosorg.nyc.mn/addressesapi.csv?token=ZYSS" # 可以添加更多链接
 ]
 limit_count = 10  # 限制提取前 5 个 IP，改成 10 以提取 10 个
 
@@ -34,7 +34,13 @@ def extract_ips(csv_content):
     reader = csv.reader(csv_content.splitlines())
     for row in reader:
         if row and row[0].count('.') == 3:  # 简单检查 IPv4 地址格式
-            ips.append(row[0])
+            ip_with_port = row[0]
+            if ':' in ip_with_port:
+                ip, port = ip_with_port.split(':')
+            else:
+                ip = ip_with_port
+                port = '443'
+            ips.append((ip, port))
         if len(ips) >= limit_count:  # 达到限制数量后停止
             break
     return ips
@@ -50,8 +56,11 @@ def get_ip_location(ip):
 
 def annotate_ips(ips):
     annotated_ips = []
-    for ip in ips:
-        annotated_ips.append(get_ip_location(ip))
+    for ip, port in ips:
+        if port:
+            annotated_ips.append(f"{ip}:{port}#{custom_prefix}{get_ip_location(ip).split('#')[1]}{custom_suffix}")
+        else:
+            annotated_ips.append(f"{ip}:443#{custom_prefix}{get_ip_location(ip).split('#')[1]}{custom_suffix}")
     return annotated_ips
 
 def upload_to_github(token, repo_name, file_path, content, commit_message):
