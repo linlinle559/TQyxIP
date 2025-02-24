@@ -9,20 +9,17 @@ repo_name = "jzhou9096/jilianip"  # 替换为你的 GitHub 仓库路径
 file_path = "bzgj.txt"  # 存储 IP 列表的文件路径
 commit_message = "Update bestcf IP list"
 
-# IP地理位置API配置
-//ipinfo_token = "80a32dbe4fc97e"  # 替换为你的ipinfo.io API密钥
-//ipinfo_base_url = "https://ipinfo.io/"
-
 # 自定义前缀和后缀
-custom_prefix = "优选"  # 自定义前缀加在 IP# 后面
-custom_suffix = "IP"  # 自定义后缀加在国家代码后面
+custom_prefix = "可"  # 自定义前缀加在 IP# 后面
+custom_suffix = "变"  # 自定义后缀加在国家代码后面
 
 # 多个 API 地址
 csv_urls = [
     "https://ipdb.030101.xyz/api/bestcf.csv",  # 第一个链接
-    //"https://addcsv.sosorg.nyc.mn/addressesapi.csv?token=ZYSS" # 可以添加更多链接
+    ""  # 第二个链接
+    # 可以添加更多链接
 ]
-limit_count = 10  # 限制提取前 5 个 IP，改成 10 以提取 10 个
+limit_count = 10  # 限制提取前 10 个 IP
 
 def download_csv(url):
     try:
@@ -53,20 +50,10 @@ def extract_ips(csv_content):
             print(f"Error processing row {row}: {e}")
     return ips
 
-def get_ip_location(ip):
-    response = requests.get(f"{ipinfo_base_url}{ip}/json", headers={"Authorization": f"Bearer {ipinfo_token}"})
-    if response.status_code == 200:
-        data = response.json()
-        country = data.get("country", "Unknown")
-        return country
-    else:
-        return "Unknown"
-
 def annotate_ips(ips):
     annotated_ips = []
     for ip, port in ips:
-        country = get_ip_location(ip)
-        annotated_ips.append(f"{ip}:{port}#{custom_prefix}{country}{custom_suffix}")
+        annotated_ips.append(f"{ip}:{port}#{custom_prefix}{custom_suffix}")
     return annotated_ips
 
 def upload_to_github(token, repo_name, file_path, content, commit_message):
@@ -76,7 +63,7 @@ def upload_to_github(token, repo_name, file_path, content, commit_message):
         file = repo.get_contents(file_path)
         repo.update_file(file.path, commit_message, content, file.sha)
     except:
-        repo.create_file(file_path, commit_message, content)
+        repo.create_file(file.path, commit_message, content)
 
 def main():
     all_ips = []
@@ -88,7 +75,7 @@ def main():
             all_ips.extend(ip_list)  # 将当前 URL 提取的 IP 添加到总列表中
     
     # 标注IP地理位置
-    //annotated_ips = annotate_ips(all_ips)
+    annotated_ips = annotate_ips(all_ips)
     
     # 将所有提取的 IP 列表合并
     file_content = "\n".join(annotated_ips)
