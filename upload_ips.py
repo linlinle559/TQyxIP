@@ -14,8 +14,8 @@ ipinfo_token = "80a32dbe4fc97e"  # 替换为你的ipinfo.io API密钥
 ipinfo_base_url = "https://ipinfo.io/"
 
 # 自定义前缀和后缀
-custom_prefix = "可"  # 自定义前缀
-custom_suffix = "变"  # 自定义后缀
+custom_prefix = ""  # 自定义前缀
+custom_suffix = ""  # 自定义后缀
 
 # 多个 API 地址
 csv_urls = [
