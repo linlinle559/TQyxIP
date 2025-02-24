@@ -20,7 +20,7 @@ custom_suffix = "变"  # 自定义后缀加在国家代码后面
 # 多个 API 地址
 csv_urls = [
     "https://ipdb.030101.xyz/api/bestcf.csv",  # 第一个链接
-    "https://jlips.jzhou.dns.navy/addtro.csv?token=JLiptq" # 可以添加更多链接
+    "https://addcsv.sosorg.nyc.mn/addressesapi.csv?token=ZYSS" # 可以添加更多链接
 ]
 limit_count = 10  # 限制提取前 5 个 IP，改成 10 以提取 10 个
 
@@ -44,7 +44,8 @@ def extract_ips(csv_content):
                 if port_index != -1:
                     ip, port = ip_with_port[:port_index], ip_with_port[port_index+1:]
                 else:
-                    ip, port = ip_with_port, '443'
+                    ip = ip_with_port
+                    port = '443'  # 默认端口
                 ips.append((ip, port))
                 if len(ips) >= limit_count:  # 达到限制数量后停止
                     break
