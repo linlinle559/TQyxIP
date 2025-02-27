@@ -85,7 +85,7 @@ def upload_to_github(token, repo_name, file_path, content, commit_message):
     url = f"https://api.github.com/repos/{repo_name}/contents/{file_path}"
     
     # 获取当前文件的内容和 SHA 值（用于更新文件）
-    response = requests.get(url, headers={'Authorization': f'token {token}'}))
+    response = requests.get(url, headers={'Authorization': f'token {token}'})
     
     if response.status_code == 200:
         file_data = response.json()
