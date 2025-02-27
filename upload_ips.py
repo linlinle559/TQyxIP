@@ -16,7 +16,7 @@ custom_suffix = "变"  # 自定义后缀加在国家代码后面
 
 # URL 列表，包括 CSV 和 HTML 链接
 urls = [
-    //"https://ipdb.030101.xyz/api/bestcf.csv",  # CSV 数据源
+    # "https://ipdb.030101.xyz/api/bestcf.csv",  # CSV 数据源
     "https://ip.164746.xyz/ipTop10.html"  # HTML 数据源
 ]
 
