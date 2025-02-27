@@ -17,10 +17,13 @@ custom_suffix = "变"  # 自定义后缀加在国家代码后面
 html_url = "https://ip.164746.xyz/ipTop10.html"  # 需要提取 IP 的 HTML 页面链接
 csv_url = "https://ipdb.030101.xyz/api/bestcf.txt"  # 替换为实际的 CSV 文件 URL
 
+# 限制上传的最大 IP 数量
+max_ips = 20  # 设置为你想上传的最大 IP 数量
+
 # 从 CSV URL 获取 IP 地址
 def read_ips_from_csv_url(csv_url):
     """从 CSV 文件 URL 中读取 IP 地址"""
-    ips = set()  # 使用 set 去重
+    ips = []  # 使用列表保存 IP 地址，保持顺序
     try:
         response = requests.get(csv_url)
         response.raise_for_status()
@@ -29,7 +32,7 @@ def read_ips_from_csv_url(csv_url):
         reader = csv.reader(decoded_content.splitlines())
         for row in reader:
             if row:
-                ips.add(row[0].strip())  # 假设 IP 地址在第一列
+                ips.append(row[0].strip())  # 假设 IP 地址在第一列
         print(f"Read {len(ips)} IPs from CSV URL.")
     except requests.RequestException as e:
         print(f"Error downloading or reading CSV: {e}")
@@ -111,14 +114,17 @@ def main():
     print(f"Downloading data from: {html_url}")
     html_content = get_html(html_url)
     
-    ip_list = set()  # 使用 set 去重
+    ip_list = []  # 使用列表保存 IP 地址，保持顺序
     
     if html_content:
         html_ips = extract_ips_from_html(html_content)
-        ip_list.update(html_ips)
+        ip_list.extend(html_ips)  # 使用 extend 添加元素，保留顺序
     
     # 合并 CSV 中的 IP 地址与 HTML 提取的 IP 地址
-    ip_list.update(csv_ips)
+    ip_list.extend(csv_ips)  # 使用 extend 以保留顺序
+    
+    # 限制上传的 IP 数量
+    ip_list = ip_list[:max_ips]  # 只保留前 max_ips 个 IP
     
     # 标注 IP 地址并格式化
     annotated_ips = annotate_ips(ip_list)
