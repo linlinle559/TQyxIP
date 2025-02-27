@@ -1,6 +1,5 @@
 import requests
 from github import Github
-from bs4 import BeautifulSoup
 import os
 
 # GitHub 配置
@@ -31,14 +30,9 @@ def get_html(url):
 def extract_ips_from_html(html_content):
     """从 HTML 页面提取 IP 地址"""
     ips = []
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    # 假设 IP 地址在 class="ip-list" 的 div 标签内
-    ip_string = soup.find('div', class_='ip-list')  # 根据实际 HTML 标签调整
-    if ip_string:
-        # 获取 IP 地址字符串并分割成 IP 地址列表
-        ip_list = ip_string.get_text().strip()
-        ips = ip_list.split(',')
+    # 页面直接返回所有 IP 地址，逗号分隔
+    ip_string = html_content.strip()  # 直接去掉两边空格
+    ips = ip_string.split(',')  # 按逗号分割成 IP 地址
     
     # 假设 IP 地址没有端口信息，默认端口 443
     ips_with_ports = [(ip.strip(), '443') for ip in ips]
