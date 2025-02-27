@@ -62,8 +62,13 @@ def extract_ips_from_html(html_content):
 def annotate_ips(ips):
     """给 IP 地址添加注释"""
     annotated_ips = []
-    for ip, port in ips:
-        annotated_ips.append(f"{ip}:{port}#{custom_prefix}{custom_suffix}")
+    for ip in ips:
+        # 如果是元组 (ip, port)，则正常处理
+        if isinstance(ip, tuple) and len(ip) == 2:
+            annotated_ips.append(f"{ip[0]}:{ip[1]}#{custom_prefix}{custom_suffix}")
+        # 如果是单一 IP 地址 (没有端口)，则默认使用端口 443
+        elif isinstance(ip, str):
+            annotated_ips.append(f"{ip}:443#{custom_prefix}{custom_suffix}")
     return annotated_ips
 
 def upload_to_github(token, repo_name, file_path, content, commit_message):
