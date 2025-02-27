@@ -64,20 +64,24 @@ def extract_ips_from_html(html_content):
 
 def annotate_ips(ips, add_annotations=True):
     """给 IP 地址添加注释"""
-    annotated_ips = [False]
+    annotated_ips = []
     for ip in ips:
         # 如果是元组 (ip, port)，则正常处理
         if isinstance(ip, tuple) and len(ip) == 2:
             if add_annotations:
+                # 返回带注释的 IP 地址
                 annotated_ips.append(f"{ip[0]}:{ip[1]}#{custom_prefix}{custom_suffix}")
             else:
-                annotated_ips.append(f"{ip[0]}:{ip[1]}")
+                # 返回只包含 IP 地址（不带端口）
+                annotated_ips.append(f"{ip[0]}")
         # 如果是单一 IP 地址 (没有端口)，则默认使用端口 443
         elif isinstance(ip, str):
             if add_annotations:
+                # 返回带注释的 IP 地址
                 annotated_ips.append(f"{ip}:443#{custom_prefix}{custom_suffix}")
             else:
-                annotated_ips.append(f"{ip}:443")
+                # 返回只包含 IP 地址（不带端口）
+                annotated_ips.append(f"{ip}")
     return annotated_ips
 
 def upload_to_github(token, repo_name, file_path, content, commit_message):
@@ -86,7 +90,8 @@ def upload_to_github(token, repo_name, file_path, content, commit_message):
     
     # 获取当前文件的内容和 SHA 值（用于更新文件）
     response = requests.get(url, headers={'Authorization': f'token {token}'})
-    
+
+
     if response.status_code == 200:
         file_data = response.json()
         sha = file_data['sha']
@@ -132,8 +137,9 @@ def main():
     # 限制上传的 IP 数量
     ip_list = ip_list[:max_ips]  # 只保留前 max_ips 个 IP
     
-    # 如果需要显示纯 IP 地址而不是注释，可以传 False
-    annotated_ips = annotate_ips(ip_list, add_annotations=False)  # 修改此处为 False 来显示纯 IP
+    # 标注 IP 地址并格式化
+    add_annotations = False  # 设置为 True 或 False，控制是否带注释
+    annotated_ips = annotate_ips(ip_list, add_annotations)
     
     # 合并所有 IP 列表为一个字符串
     file_content = "\n".join(annotated_ips)
