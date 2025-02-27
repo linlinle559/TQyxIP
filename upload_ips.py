@@ -1,5 +1,6 @@
 import requests
 import os
+import csv
 from base64 import b64encode
 
 # GitHub 配置
@@ -14,7 +15,25 @@ custom_suffix = "变"  # 自定义后缀加在国家代码后面
 
 # HTML 页面链接
 html_url = "https://ip.164746.xyz/ipTop10.html"  # 需要提取 IP 的 HTML 页面链接
-limit_count = 10  # 限制提取前 10 个 IP
+csv_url = "https://ipdb.030101.xyz/api/bestcf.csv"  # 替换为实际的 CSV 文件 URL
+
+# 从 CSV URL 获取 IP 地址
+def read_ips_from_csv_url(csv_url):
+    """从 CSV 文件 URL 中读取 IP 地址"""
+    ips = set()  # 使用 set 去重
+    try:
+        response = requests.get(csv_url)
+        response.raise_for_status()
+        # 解析 CSV 内容
+        decoded_content = response.content.decode('utf-8')
+        reader = csv.reader(decoded_content.splitlines())
+        for row in reader:
+            if row:
+                ips.add(row[0].strip())  # 假设 IP 地址在第一列
+        print(f"Read {len(ips)} IPs from CSV URL.")
+    except requests.RequestException as e:
+        print(f"Error downloading or reading CSV: {e}")
+    return ips
 
 def get_html(url):
     """使用 requests 获取 HTML 页面内容"""
@@ -80,21 +99,31 @@ def upload_to_github(token, repo_name, file_path, content, commit_message):
         print(f"Failed to upload file: {response.status_code} - {response.text}")
 
 def main():
+    # 从 CSV 文件 URL 读取 IP 地址
+    csv_ips = read_ips_from_csv_url(csv_url)
+    
     # 获取 HTML 内容
     print(f"Downloading data from: {html_url}")
     html_content = get_html(html_url)
+    
+    ip_list = set()  # 使用 set 去重
+    
     if html_content:
-        ip_list = extract_ips_from_html(html_content)
+        html_ips = extract_ips_from_html(html_content)
+        ip_list.update(html_ips)
     
-        # 标注 IP 地址并格式化
-        annotated_ips = annotate_ips(ip_list)
+    # 合并 CSV 中的 IP 地址与 HTML 提取的 IP 地址
+    ip_list.update(csv_ips)
     
-        # 合并所有 IP 列表为一个字符串
-        file_content = "\n".join(annotated_ips)
+    # 标注 IP 地址并格式化
+    annotated_ips = annotate_ips(ip_list)
     
-        # 上传到 GitHub
-        upload_to_github(github_token, repo_name, file_path, file_content, commit_message)
-        print("Upload completed.")
+    # 合并所有 IP 列表为一个字符串
+    file_content = "\n".join(annotated_ips)
+    
+    # 上传到 GitHub
+    upload_to_github(github_token, repo_name, file_path, file_content, commit_message)
+    print("Upload completed.")
 
 if __name__ == "__main__":
     main()
