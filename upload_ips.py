@@ -10,8 +10,8 @@ file_path = "yxip.txt"  # 存储 IP 列表的文件路径
 commit_message = "Update bestcf IP list"
 
 # 自定义前缀和后缀
-custom_prefix = "优选"  # 自定义前缀加在 IP# 后面
-custom_suffix = "IP"  # 自定义后缀加在国家代码后面
+custom_prefix = "优"  # 自定义前缀加在 IP# 后面
+custom_suffix = "选IP"  # 自定义后缀加在国家代码后面
 
 # HTML 页面链接
 html_url = "https://ip.164746.xyz/ipTop10.html"  # 需要提取 IP 的 HTML 页面链接
