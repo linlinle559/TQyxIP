@@ -138,7 +138,7 @@ def main():
     ip_list = ip_list[:max_ips]  # 只保留前 max_ips 个 IP
     
     # 标注 IP 地址并格式化
-    add_annotations = True  # 设置为 True 或 False，控制是否带注释
+    add_annotations = False  # 设置为 True 或 False，控制是否带注释
     annotated_ips = annotate_ips(ip_list, add_annotations)
     
     # 合并所有 IP 列表为一个字符串
