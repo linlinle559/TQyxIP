@@ -15,7 +15,7 @@ custom_suffix = "选IP"  # 自定义后缀加在国家代码后面
 
 # HTML 页面链接
 html_url = "https://ip.164746.xyz/ipTop10.html"  # 需要提取 IP 的 HTML 页面链接
-csv_url = "https://jlips.jzhou.dns.navy/yxipJP.txt?token=JLiptq"  # 替换为实际的 CSV 文件 URL
+csv_url = ""  # 替换为实际的 CSV 文件 URL
 
 # 限制上传的最大 IP 数量
 max_ips = 20  # 设置为你想上传的最大 IP 数量
