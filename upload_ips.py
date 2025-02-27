@@ -15,7 +15,7 @@ custom_suffix = "变"  # 自定义后缀加在国家代码后面
 
 # HTML 页面链接
 html_url = "https://ip.164746.xyz/ipTop10.html"  # 需要提取 IP 的 HTML 页面链接
-# csv_url = "https://ipdb.030101.xyz/api/bestcf.csv"  # 替换为实际的 CSV 文件 URL
+csv_url = "https://ipdb.030101.xyz/api/bestcf.csv"  # 替换为实际的 CSV 文件 URL
 
 # 从 CSV URL 获取 IP 地址
 def read_ips_from_csv_url(csv_url):
