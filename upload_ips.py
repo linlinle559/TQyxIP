@@ -1,7 +1,7 @@
 import requests
-import os
 from github import Github
 from bs4 import BeautifulSoup
+import os
 
 # GitHub 配置
 github_token = os.getenv("MY_GITHUB_TOKEN")
@@ -33,7 +33,7 @@ def extract_ips_from_html(html_content):
     ips = []
     soup = BeautifulSoup(html_content, 'html.parser')
 
-    # 假设 IP 地址是以逗号分隔的字符串在一个 div 中
+    # 假设 IP 地址在 class="ip-list" 的 div 标签内
     ip_string = soup.find('div', class_='ip-list')  # 根据实际 HTML 标签调整
     if ip_string:
         # 获取 IP 地址字符串并分割成 IP 地址列表
