@@ -16,7 +16,7 @@ custom_suffix = "变"  # 自定义后缀加在国家代码后面
 
 # URL 列表，包括 CSV 和 HTML 链接
 urls = [
-    # "https://ipdb.030101.xyz/api/bestcf.csv",  # CSV 数据源
+    "",  # CSV 数据源
     "https://ip.164746.xyz/ipTop10.html"  # HTML 数据源
 ]
 
@@ -27,6 +27,7 @@ def download_csv(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
+        print(f"Downloaded CSV content from {url}")
         return response.text
     except requests.RequestException as e:
         print(f"Error downloading {url}: {e}")
@@ -51,6 +52,7 @@ def extract_ips_from_csv(csv_content):
                     break
         except Exception as e:
             print(f"Error processing row {row}: {e}")
+    print(f"Extracted IPs from CSV: {ips}")
     return ips
 
 def download_html(url):
@@ -58,6 +60,7 @@ def download_html(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
+        print(f"Downloaded HTML content from {url}")
         return response.text
     except requests.RequestException as e:
         print(f"Error downloading {url}: {e}")
@@ -77,6 +80,7 @@ def extract_ips_from_html(html_content):
     
     # 假设 IP 地址没有端口信息，默认端口 443
     ips_with_ports = [(ip.strip(), '443') for ip in ips]
+    print(f"Extracted IPs from HTML: {ips_with_ports}")
     
     return ips_with_ports
 
@@ -114,6 +118,10 @@ def main():
             if html_content:
                 ip_list = extract_ips_from_html(html_content)
                 all_ips.extend(ip_list)  # 将当前 URL 提取的 IP 添加到总列表中
+    
+    if not all_ips:
+        print("No IPs extracted. Exiting.")
+        return
     
     # 标注 IP 地址并格式化
     annotated_ips = annotate_ips(all_ips)
