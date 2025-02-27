@@ -1,6 +1,6 @@
 import requests
-from github import Github
 import os
+from base64 import b64encode
 
 # GitHub 配置
 github_token = os.getenv("MY_GITHUB_TOKEN")
@@ -49,13 +49,35 @@ def annotate_ips(ips):
 
 def upload_to_github(token, repo_name, file_path, content, commit_message):
     """将结果上传到 GitHub 仓库"""
-    g = Github(token)
-    repo = g.get_repo(repo_name)
-    try:
-        file = repo.get_contents(file_path)
-        repo.update_file(file.path, commit_message, content, file.sha)
-    except:
-        repo.create_file(file_path, commit_message, content)
+    url = f"https://api.github.com/repos/{repo_name}/contents/{file_path}"
+    
+    # 获取当前文件的内容和 SHA 值（用于更新文件）
+    response = requests.get(url, headers={'Authorization': f'token {token}'})
+    
+    if response.status_code == 200:
+        file_data = response.json()
+        sha = file_data['sha']
+    else:
+        sha = None  # 如果文件不存在，创建新文件
+    
+    # 用 Base64 编码内容
+    encoded_content = b64encode(content.encode('utf-8')).decode('utf-8')
+    
+    # 构建上传请求的数据
+    data = {
+        "message": commit_message,
+        "content": encoded_content
+    }
+    if sha:
+        data["sha"] = sha  # 更新文件时需要传递 SHA 值
+    
+    # 发送请求上传文件
+    response = requests.put(url, json=data, headers={'Authorization': f'token {token}'})
+    
+    if response.status_code == 201 or response.status_code == 200:
+        print("File uploaded successfully.")
+    else:
+        print(f"Failed to upload file: {response.status_code} - {response.text}")
 
 def main():
     # 获取 HTML 内容
